@@ -19,5 +19,6 @@ class Number extends Model
     protected $fillable = [
         'number',
         'numeral',
+        'count',
     ];
 }

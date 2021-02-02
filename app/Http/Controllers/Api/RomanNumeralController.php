@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\NumberResource;
 use App\Models\Number;
+use Illuminate\Support\Facades\DB;
 
 /**
  * A controller to convert integers to roman numerals.
@@ -56,10 +58,19 @@ class RomanNumeralController
             }
         }
 
-        $numberObj = new Number();
-        $numberObj->number = $originalNumber;
-        $numberObj->numeral = $numeral;
-        $numberObj->save();
+        $findNumber = Number::where('number', $originalNumber)->first();
+
+        if ($findNumber) {
+            $findNumber->update([
+                'count' => $findNumber->count + 1
+            ]);
+        } else {
+            $numberObj = new Number();
+            $numberObj->number = $originalNumber;
+            $numberObj->numeral = $numeral;
+            $numberObj->count = 1;
+            $numberObj->save();
+        }
 
         return response()->json([
             'success' => true,
@@ -72,7 +83,13 @@ class RomanNumeralController
      */
     public function recentlyConverted()
     {
+        $numbers = Number::orderBy('id', 'desc')->get();
+        $data = NumberResource::collection($numbers);
 
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ], 200);
     }
 
     /**
@@ -80,6 +97,11 @@ class RomanNumeralController
      */
     public function topTenConverted()
     {
+        $numbers = Number::orderBy('count', 'desc')->get();
 
+        return response()->json([
+            'success' => true,
+            'data' => $numbers
+        ], 200);
     }
 }

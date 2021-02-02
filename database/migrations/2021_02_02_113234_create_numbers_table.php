@@ -20,6 +20,7 @@ class CreateNumbersTable extends Migration
             $table->id();
             $table->integer('number');
             $table->string('numeral');
+            $table->integer('count');
             $table->timestamps();
             $table->softDeletes();
         });
